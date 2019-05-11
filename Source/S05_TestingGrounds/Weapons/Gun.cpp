@@ -14,7 +14,7 @@ AGun::AGun()
 	PrimaryActorTick.bCanEverTick = true;
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
-
+	/*
 	// Create VR Controllers.
 	R_MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("R_MotionController"));
 	R_MotionController->MotionSource = FXRMotionControllerBase::RightHandSourceId;
@@ -38,10 +38,9 @@ AGun::AGun()
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
-
+	*/
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	FP_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
 	FP_Gun->bCastDynamicShadow = false;
 	FP_Gun->CastShadow = false;
 	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -56,7 +55,7 @@ AGun::AGun()
 void AGun::BeginPlay()
 {
 	Super::BeginPlay();
-
+	/*
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	if (bUsingMotionControllers)
 	{
@@ -67,7 +66,7 @@ void AGun::BeginPlay()
 	{
 		VR_Gun->SetHiddenInGame(true, true);
 	//	Mesh1P->SetHiddenInGame(false, true);
-	}
+	}*/
 }
 
 // Called every frame
@@ -84,7 +83,7 @@ void AGun::OnFire()
 	{
 		UWorld* const World = GetWorld();
 		if (World != NULL)
-		{
+		{/*
 			if (bUsingMotionControllers)
 			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
@@ -92,7 +91,7 @@ void AGun::OnFire()
 				World->SpawnActor<AFirstPersonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 			}
 			else
-			{
+			{*/
 				const FRotator SpawnRotation = FP_MuzzleLocation->GetComponentRotation();
 				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 				const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
@@ -103,7 +102,7 @@ void AGun::OnFire()
 
 				// spawn the projectile at the muzzle
 				World->SpawnActor<AFirstPersonProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
+			//}
 		}
 	}
 
