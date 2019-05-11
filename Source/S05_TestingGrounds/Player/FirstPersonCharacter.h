@@ -52,6 +52,9 @@ protected:
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
 
+	/** Fires a projectile. */
+	void OnFire();
+
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 
