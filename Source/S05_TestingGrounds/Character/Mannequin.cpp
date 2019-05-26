@@ -42,9 +42,15 @@ void AMannequin::BeginPlay()
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Gun->AttachToComponent(FP_Arms_Mesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint")); //Attach gun mesh component to Skeleton, doing it here because the skelton is not yet created in the constructor
 	Gun->AnimInstance = FP_Arms_Mesh->GetAnimInstance();
+
+	if (InputComponent != NULL)
+	{
+		// Bind fire event
+		InputComponent->BindAction("Fire", IE_Pressed, this, &AMannequin::PullTrigger);
+	}
 }
 
-void AMannequin::Fire()
+void AMannequin::PullTrigger()
 {
 	if (Gun)
 	{
