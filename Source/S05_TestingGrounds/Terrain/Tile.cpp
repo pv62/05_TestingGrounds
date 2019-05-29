@@ -16,44 +16,57 @@ ATile::ATile()
 	MaxExtent = FVector(4000, 2000, 0);
 }
 
+template<class T>
+void ATile::RandomlyPlaceActors(TSubclassOf<T> ToSpawn, FSpawnParameters SpawnParameters)
+{
+	int NumberToSpawn = FMath::RandRange(SpawnParameters.MinSpawn, SpawnParameters.MaxSpawn);
+	for (int i = 0; i < NumberToSpawn; i++)
+	{
+		FSpawnPosition SpawnPosition;
+		SpawnPosition.Scale = FMath::RandRange(SpawnParameters.MinScale, SpawnParameters.MaxScale);
+		bool found = FindEmptyLocation(SpawnPosition.Location, SpawnParameters.Radius * SpawnPosition.Scale);
+		if (found)
+		{
+			SpawnPosition.Rotation = FMath::RandRange(-180.f, 180.f);
+			PlaceActor(ToSpawn, SpawnPosition);
+		}
+	}
+}
+
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnParameters SpawnParameters)
 {
-	TArray<FSpawnPosition> SpawnPositions = RandomSpawnPositions(SpawnParameters);
-	for (FSpawnPosition SpawnPosition : SpawnPositions)
-	{
-		PlaceActor(ToSpawn, SpawnPosition);
-	}
+	RandomlyPlaceActors(ToSpawn, SpawnParameters);
 }
 
 void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnParameters SpawnParameters)
 {
-	TArray<FSpawnPosition> SpawnPositions = RandomSpawnPositions(SpawnParameters);
-	for (FSpawnPosition SpawnPosition : SpawnPositions)
-	{
-		PlaceAIPawn(ToSpawn, SpawnPosition);
-	}
+	RandomlyPlaceActors(ToSpawn, SpawnParameters);
 }
 
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
-	if (Spawned == nullptr)	{ return; }
-	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
-	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
-	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
-	Garbage.Add(Spawned);
+	if (Spawned)
+	{
+		Spawned->SetActorRelativeLocation(SpawnPosition.Location);
+		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
+		Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
+		Garbage.Add(Spawned);
+	}
 }
 
-void ATile::PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
+void ATile::PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
-	if (Spawned == nullptr) { return; }
-	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
-	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
-	Spawned->SpawnDefaultController();
-	Spawned->Tags.Add(FName("Enemy"));
+	if (Spawned)
+	{
+		Spawned->SetActorRelativeLocation(SpawnPosition.Location);
+		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
+		Spawned->SpawnDefaultController();
+		Spawned->Tags.Add(FName("Enemy"));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -101,25 +114,6 @@ void ATile::PositionNavMeshBoundsVolume()
 	UE_LOG(LogTemp, Warning, TEXT("[%s] Checked out: {%s}"), *GetName(), *NavMeshBoundsVolume->GetName());
 	NavMeshBoundsVolume->SetActorLocation(GetActorLocation() + NavigationBoundsOffset);
 	GetWorld()->GetNavigationSystem()->Build();
-}
-
-TArray<FSpawnPosition> ATile::RandomSpawnPositions(FSpawnParameters SpawnParameters)
-{
-	TArray<FSpawnPosition> SpawnPositions;
-	int NumberToSpawn = FMath::RandRange(SpawnParameters.MinSpawn, SpawnParameters.MaxSpawn);
-	for (int i = 0; i < NumberToSpawn; i++)
-	{
-		FSpawnPosition SpawnPosition;
-		SpawnPosition.Scale = FMath::RandRange(SpawnParameters.MinScale, SpawnParameters.MaxScale);
-		bool found = FindEmptyLocation(SpawnPosition.Location, SpawnParameters.Radius * SpawnPosition.Scale);
-		if (found)
-		{
-			SpawnPosition.Rotation = FMath::RandRange(-180.f, 180.f);
-			SpawnPositions.Add(SpawnPosition);
-		}
-	}
-
-	return SpawnPositions;
 }
 
 bool ATile::FindEmptyLocation(FVector& OutLocation, float Radius)
