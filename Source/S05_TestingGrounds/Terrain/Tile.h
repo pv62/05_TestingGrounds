@@ -97,4 +97,7 @@ private:
 	UActorPool* Pool;
 
 	AActor* NavMeshBoundsVolume;
+
+	//Holds the actors created every tile and get destroy when the tile is destroy
+	TArray<AActor*> Garbage;
 };

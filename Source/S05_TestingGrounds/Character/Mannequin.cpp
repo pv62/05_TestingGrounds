@@ -60,6 +60,11 @@ void AMannequin::BeginPlay()
 	}
 }
 
+void AMannequin::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Gun->Destroy();
+}
+
 void AMannequin::PullTrigger()
 {
 	if (Gun)

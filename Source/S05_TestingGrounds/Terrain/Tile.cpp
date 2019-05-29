@@ -37,15 +37,18 @@ void ATile::PlaceAIPawns(TSubclassOf<APawn> ToSpawn, FSpawnParameters SpawnParam
 void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
+	if (Spawned == nullptr)	{ return; }
 	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
 	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
+	Garbage.Add(Spawned);
 }
 
 void ATile::PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn);
+	if (Spawned == nullptr) { return; }
 	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
@@ -62,7 +65,16 @@ void ATile::BeginPlay()
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	if (NavMeshBoundsVolume == nullptr) { return; }
 	Pool->Return(NavMeshBoundsVolume);
+
+	if (Garbage.Num() != 0)
+	{
+		while (Garbage.Num() != 0)
+		{
+			Garbage.Pop()->Destroy();
+		}
+	}
 }
 
 // Called every frame
