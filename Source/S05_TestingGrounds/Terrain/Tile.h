@@ -6,6 +6,42 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+USTRUCT(Blueprintable)
+struct FSpawnPosition
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	FVector Location; 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	float Rotation; 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	float Scale;
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnParameters
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	int MinSpawn = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	int MaxSpawn = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	float Radius = 500;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	float MinScale = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	float MaxScale = 1;
+};
+
 class UActorPool;
 
 UCLASS()
@@ -18,7 +54,7 @@ public:
 	ATile();
 
 	UFUNCTION(BlueprintCallable, Category = "Generation")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500, float MinScale = 1, float MaxScale = 1);
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, FSpawnParameters SpawnParameters);
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,9 +81,11 @@ public:
 private:
 	void PositionNavMeshBoundsVolume();
 
+	TArray<FSpawnPosition> RandomSpawnPositions(FSpawnParameters SpawnDetails);
+
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float Rotation, float Scale);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 	
