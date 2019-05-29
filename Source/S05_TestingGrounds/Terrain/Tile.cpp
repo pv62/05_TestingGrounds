@@ -2,6 +2,7 @@
 
 #include "Tile.h"
 #include "Engine/World.h"
+#include "ActorPool.h"
 
 // Sets default values
 ATile::ATile()
@@ -38,6 +39,11 @@ void ATile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATile::SetPool(UActorPool * InPool)
+{
+	Pool = InPool;
 }
 
 bool ATile::FindEmptyLocation(FVector& OutLocation, float Radius)
