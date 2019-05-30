@@ -96,6 +96,8 @@ private:
 	void PlaceActor(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
+
+	bool CanSpawnAI;
 	
 	UActorPool* Pool;
 
